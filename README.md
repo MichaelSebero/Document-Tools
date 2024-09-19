@@ -4,7 +4,7 @@
 ## How to Install
 
 ```
-pip install pyzipper textract
+pip install pyzipper textract python-magic
 
 git clone https://github.com/MichaelSebero/Document-Tools
 
