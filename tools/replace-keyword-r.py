@@ -1,34 +1,64 @@
 import os
-import json
 
-def replace_keyword_in_file(file_path, old_keyword, new_keyword):
-    with open(file_path, 'r') as file:
-        content = file.read()
-        updated_content = content.replace(old_keyword, new_keyword)
+def replace_in_file(file_path, old_text, new_text):
+    try:
+        # Read the content
+        with open(file_path, 'r', encoding='utf-8') as file:
+            content = file.read()
+        
+        # Perform replacement
+        if old_text in content:
+            updated_content = content.replace(old_text, new_text)
+            
+            # Write changes back
+            with open(file_path, 'w', encoding='utf-8') as file:
+                file.write(updated_content)
+            return True
+        return False
+    except Exception as e:
+        print(f"Error processing {file_path}: {str(e)}")
+        return False
+
+def process_directory(directory_path, old_text, new_text):
+    modified_files = 0
+    total_files = 0
+    base_path_length = len(directory_path.rstrip(os.sep))
     
-    with open(file_path, 'w') as file:
-        file.write(updated_content)
+    # Walk through all files in directory and subdirectories
+    for root, dirs, files in os.walk(directory_path):
+        # Calculate current depth for display
+        relative_path = root[base_path_length:]
+        depth = relative_path.count(os.sep)
+        indent = "  " * depth
+        
+        # Print current directory being processed
+        current_dir = os.path.basename(root) or root
+        print(f"\n{indent}└── {current_dir}/")
+        
+        # Process all files in current directory
+        for file in files:
+            total_files += 1
+            file_path = os.path.join(root, file)
+            if replace_in_file(file_path, old_text, new_text):
+                modified_files += 1
+                print(f"{indent}    ├── {file} (modified)")
+            else:
+                print(f"{indent}    ├── {file}")
+    
+    return modified_files, total_files
 
 def main():
-    # Get user input
-    directory_path = input("Enter the file path: ")
-    old_keyword = input("Enter the keyword to replace: ")
-    new_keyword = input("Enter the replacement keyword: ")
+    directory = input("Directory path: ")
+    old_text = input("Text to replace: ")
+    new_text = input("Replace with: ")
 
-    # Iterate over files in the directory
-    for filename in os.listdir(directory_path):
-        file_path = os.path.join(directory_path, filename)
+    if not os.path.isdir(directory):
+        print("Error: Invalid directory path")
+        return
 
-        # Check if it's a file (not a directory) and has an extension
-        if os.path.isfile(file_path) and '.' in filename:
-            file_extension = filename.split('.')[-1]
-
-            # Replace keyword only for supported file extensions (json, conf, txt)
-            if file_extension.lower() in ('json', 'conf', 'txt'):
-                replace_keyword_in_file(file_path, old_keyword, new_keyword)
-                print(f"Replaced '{old_keyword}' with '{new_keyword}' in {filename}")
-
-    print("Replacement process completed.")
+    print(f"\nProcessing directory: {directory}")
+    modified, total = process_directory(directory, old_text, new_text)
+    print(f"\nComplete! Modified {modified} out of {total} files")
 
 if __name__ == "__main__":
     main()
