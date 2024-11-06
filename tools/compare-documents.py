@@ -13,7 +13,7 @@ def find_and_write_common_and_diff_lines(file1_path, file2_path, output_path):
     differing_lines_file1 = file1_lines - common_lines
     differing_lines_file2 = file2_lines - common_lines
 
-    border = "=" * 20  # You can adjust the number of '=' as needed
+    border = "=" * 20
 
     with open(output_path, 'w', encoding='utf-8') as output_file:
         output_file.write(f"{border} Common Lines {border}\n")
@@ -24,9 +24,9 @@ def find_and_write_common_and_diff_lines(file1_path, file2_path, output_path):
         output_file.write('\n'.join(sorted(differing_lines_file2)))
 
 if __name__ == "__main__":
-    # Get input file paths from the user
-    file1_path = input("Enter the file path of the first document: ")
-    file2_path = input("Enter the file path of the second document: ")
+    # Get input file paths from the user and strip any extra whitespace
+    file1_path = input("Enter the file path of the first document: ").strip()
+    file2_path = input("Enter the file path of the second document: ").strip()
 
     # Get the user's desktop directory
     desktop_path = os.path.join(os.path.expanduser('~'), 'Desktop')
